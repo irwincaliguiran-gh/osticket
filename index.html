@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Submit a Support Ticket</title>
+  <title>FUJITSU osTicket Form</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,10 +15,6 @@
       background: white;
       padding: 20px;
       border-radius: 8px;
-    }
-    h2 {
-      text-align: center;
-      color: #333;
     }
     input, textarea, select {
       width: 100%;
@@ -44,28 +40,50 @@
 <body>
   <div class="container">
     <h2>Submit a Support Ticket</h2>
-    <form action="submit_ticket.html" method="POST">
+    <form id="ticketForm">
       <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" required>
 
       <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required>
+      <input type="email" id="email" required>
 
       <label for="subject">Subject</label>
-      <input type="text" id="subject" name="subject" required>
+      <input type="text" id="subject" required>
 
       <label for="message">Message</label>
-      <textarea id="message" name="message" rows="6" required></textarea>
+      <textarea id="message" rows="6" required></textarea>
 
       <label for="priority">Priority</label>
-      <select id="priority" name="priority">
-        <option value="low">Low</option>
-        <option value="normal">Normal</option>
-        <option value="high">High</option>
+      <select id="priority">
+        <option value="Low">Low</option>
+        <option value="Normal">Normal</option>
+        <option value="High">High</option>
       </select>
 
       <button type="submit">Submit Ticket</button>
     </form>
   </div>
+
+  <script>
+    document.getElementById("ticketForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const subject = document.getElementById("subject").value;
+      const message = document.getElementById("message").value;
+      const priority = document.getElementById("priority").value;
+
+      const report = `
+        <h2>Ticket Submitted Successfully</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong> ${message}</p>
+        <p><strong>Priority:</strong> ${priority}</p>
+        <p><em>Thank you! Your ticket has been logged.</em></p>
+      `;
+      document.body.innerHTML = report;
+    });
+  </script>
 </body>
 </html>
