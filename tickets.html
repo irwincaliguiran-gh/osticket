@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submitted Tickets</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 1000px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h2>Submitted Tickets</h2>
+  <table id="ticketTable">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Ticket ID</th>
+        <th>Project Number</th>
+        <th>Project Name</th>
+        <th>Project Manager</th>
+        <th>Budget</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Priority Level</th>
+        <th>Assigned Team</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const tableBody = document.querySelector("#ticketTable tbody");
+    const scriptURL = "AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x"; // Replace with your actual Web App URL
+
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(data => {
+        tableBody.innerHTML = "";
+        data.forEach(ticket => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${ticket.Timestamp}</td>
+            <td>${ticket["Ticket ID"]}</td>
+            <td>${ticket["Project Number"]}</td>
+            <td>${ticket["Project Name"]}</td>
+            <td>${ticket["Project Manager"]}</td>
+            <td>${ticket.Budget}</td>
+            <td>${ticket["Start Date"]}</td>
+            <td>${ticket["End Date"]}</td>
+            <td>${ticket["Priority Level"]}</td>
+            <td>${ticket["Assigned Team"]}</td>
+            <td>${ticket.Remarks}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error("Error loading tickets:", error);
+      });
+  </script>
+</body>
+</html>
