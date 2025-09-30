@@ -35,28 +35,44 @@
 
   
    
-   <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgbc6TH4T28COmnkHRzr0l8wCPrSkto0ySrxQ-7J-NG68_erAyMa5Rv56GmIe0_zc9Ow/exec';  // make sure it ends with /exec
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec'; // replace with your URL
+    const form = document.getElementById('ticketForm');
+    const resp = document.getElementById('response');
 
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(data).toString()
-      });
-      const text = await res.text();
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${text}`);
-      resp.style.color = 'green';
-      resp.textContent = '✅ Ticket submitted successfully!';
-    } catch (err) {
-      console.error('Submit error', err);
-      resp.style.color = 'red';
-      resp.textContent = `❌ Error submitting ticket: ${err.message}`;
+    function generateTicketId() {
+      const d = new Date();
+      return 'TKT-' +
+        d.getFullYear().toString().slice(-2) +
+        ('0'+(d.getMonth()+1)).slice(-2) +
+        ('0'+d.getDate()).slice(-2) + '-' +
+        ('0'+d.getHours()).slice(-2) +
+        ('0'+d.getMinutes()).slice(-2) +
+        ('0'+d.getSeconds()).slice(-2);
     }
-  });
-</script>
+
+    document.getElementById('ticketId').value = generateTicketId();
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: new URLSearchParams(data).toString()
+      })
+      .then(r => r.json())
+      .then(_ => {
+        resp.textContent = 'Ticket submitted successfully!';
+        form.reset();
+        document.getElementById('ticketId').value = generateTicketId();
+      })
+      .catch(() => {
+        resp.textContent = 'Error submitting ticket.';
+        resp.style.color = 'red';
+      });
+    });
+  </script>
+
 </body>
 </html>
