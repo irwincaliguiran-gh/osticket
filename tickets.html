@@ -5,10 +5,10 @@
   <title>View Submitted Tickets</title>
   <style>
     body { font-family: Arial; margin: 20px auto; max-width: 1000px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f2f2f2; }
-    button { margin-top: 20px; padding: 8px 12px; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+    th { background:#f2f2f2; }
+    button { margin-top:20px; padding:8px 12px; }
   </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
 
   <script>
     const BODY = document.getElementById('ticketBody');
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyOZVfvyiOawAqw0smuRtVAmE_8SDVNhoqvgyv-Jlo7z44CPdtdhtI-gxIiJi8cUSAnnA/exec'; // same Web App URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgbc6TH4T28COmnkHRzr0l8wCPrSkto0ySrxQ-7J-NG68_erAyMa5Rv56GmIe0_zc9Ow/exec'; // same URL
 
     fetch(SCRIPT_URL)
       .then(r => r.json())
@@ -47,7 +47,7 @@
             <td>${t['Project Number']}</td>
             <td>${t['Project Name']}</td>
             <td>${t['Project Manager']}</td>
-            <td>${t.Budget}</td>
+            <td>$${t.Budget}</td>
             <td>${t['Start Date']}</td>
             <td>${t['End Date']}</td>
             <td>${t['Priority Level']}</td>
