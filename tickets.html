@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Submitted Tickets</title>
+  <meta charset="utf-8">
+  <title>View Submitted Tickets</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 1000px; margin: auto; }
+    body { font-family: Arial; margin: 20px auto; max-width: 1000px; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
+    th { background: #f2f2f2; }
+    button { margin-top: 20px; padding: 8px 12px; }
   </style>
 </head>
 <body>
   <h2>Submitted Tickets</h2>
-  <table id="ticketTable">
+  <table>
     <thead>
       <tr>
         <th>Timestamp</th>
@@ -27,38 +29,34 @@
         <th>Remarks</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="ticketBody"></tbody>
   </table>
+  <button onclick="history.back()">← Back to Submit</button>
 
   <script>
-    const tableBody = document.querySelector("#ticketTable tbody");
-    const scriptURL = "AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x"; // Replace with your actual Web App URL
+    const BODY = document.getElementById('ticketBody');
+    const SCRIPT_URL = 'AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x'; // same Web App URL
 
-    fetch(scriptURL)
-      .then(response => response.json())
+    fetch(SCRIPT_URL)
+      .then(r => r.json())
       .then(data => {
-        tableBody.innerHTML = "";
-        data.forEach(ticket => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${ticket.Timestamp}</td>
-            <td>${ticket["Ticket ID"]}</td>
-            <td>${ticket["Project Number"]}</td>
-            <td>${ticket["Project Name"]}</td>
-            <td>${ticket["Project Manager"]}</td>
-            <td>${ticket.Budget}</td>
-            <td>${ticket["Start Date"]}</td>
-            <td>${ticket["End Date"]}</td>
-            <td>${ticket["Priority Level"]}</td>
-            <td>${ticket["Assigned Team"]}</td>
-            <td>${ticket.Remarks}</td>
-          `;
-          tableBody.appendChild(row);
-        });
+        BODY.innerHTML = data.map(t => `
+          <tr>
+            <td>${t.Timestamp}</td>
+            <td>${t['Ticket ID']}</td>
+            <td>${t['Project Number']}</td>
+            <td>${t['Project Name']}</td>
+            <td>${t['Project Manager']}</td>
+            <td>${t.Budget}</td>
+            <td>${t['Start Date']}</td>
+            <td>${t['End Date']}</td>
+            <td>${t['Priority Level']}</td>
+            <td>${t['Assigned Team']}</td>
+            <td>${t.Remarks}</td>
+          </tr>
+        `).join('');
       })
-      .catch(error => {
-        console.error("Error loading tickets:", error);
-      });
+      .catch(console.error);
   </script>
 </body>
 </html>
