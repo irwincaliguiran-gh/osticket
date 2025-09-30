@@ -35,7 +35,7 @@
 
   <script>
     const BODY = document.getElementById('ticketBody');
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec'; // same URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec';
 
     fetch(SCRIPT_URL)
       .then(r => r.json())
@@ -47,7 +47,7 @@
             <td>${t['Project Number']}</td>
             <td>${t['Project Name']}</td>
             <td>${t['Project Manager']}</td>
-            <td>$${t.Budget}</td>
+            <td>$${parseFloat(t.Budget).toFixed(2)}</td>
             <td>${t['Start Date']}</td>
             <td>${t['End Date']}</td>
             <td>${t['Priority Level']}</td>
@@ -56,7 +56,10 @@
           </tr>
         `).join('');
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error('Load error:', err);
+        BODY.innerHTML = '<tr><td colspan="11">Error loading tickets</td></tr>';
+      });
   </script>
 </body>
 </html>
