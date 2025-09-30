@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>Submit Project Ticket</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
-    input, textarea, select, button { width: 100%; margin-bottom: 10px; padding: 8px; }
+    body { font-family: Arial; margin: 20px auto; max-width: 700px; }
+    input, textarea, select, button { width: 100%; padding: 8px; margin: 6px 0; }
+    button { cursor: pointer; }
   </style>
 </head>
 <body>
   <h2>Submit a Project Ticket</h2>
   <form id="ticketForm">
-    <input type="text" name="ticketId" id="ticketId" readonly />
+    <input type="text" id="ticketId" name="ticketId" readonly />
     <input type="text" name="projectNumber" placeholder="Project Number" required />
     <input type="text" name="projectName" placeholder="Project Name" required />
     <input type="text" name="projectManager" placeholder="Project Manager" required />
@@ -19,63 +21,53 @@
     <input type="date" name="endDate" required />
     <select name="priorityLevel" required>
       <option value="">Priority Level</option>
-      <option value="Low">Low</option>
-      <option value="Medium">Medium</option>
-      <option value="High">High</option>
+      <option>Low</option>
+      <option>Medium</option>
+      <option>High</option>
     </select>
     <input type="text" name="assignedTeam" placeholder="Assigned Team" required />
     <textarea name="remarks" placeholder="Remarks"></textarea>
     <button type="submit">Submit Ticket</button>
   </form>
 
-  <p id="response"></p>
-  <a href="tickets.html">View Submitted Tickets</a>
+  <p id="response" style="color:green;"></p>
+  <p><a href="tickets.html">View Submitted Tickets</a></p>
 
   <script>
     const form = document.getElementById('ticketForm');
-    const responseMsg = document.getElementById('response');
-    const scriptURL = "AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x"; // Replace with your actual Web App URL
+    const responseEl = document.getElementById('response');
+    const SCRIPT_URL = 'AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x'; // replace this
 
     function generateTicketId() {
-      const now = new Date();
-      return "TKT-" +
-        now.getFullYear().toString().slice(-2) +
-        ("0" + (now.getMonth() + 1)).slice(-2) +
-        ("0" + now.getDate()).slice(-2) + "-" +
-        ("0" + now.getHours()).slice(-2) +
-        ("0" + now.getMinutes()).slice(-2) +
-        ("0" + now.getSeconds()).slice(-2);
+      const d = new Date();
+      return 'TKT-' +
+        d.getFullYear().toString().slice(-2) +
+        ('0'+(d.getMonth()+1)).slice(-2) +
+        ('0'+d.getDate()).slice(-2) + '-' +
+        ('0'+d.getHours()).slice(-2) +
+        ('0'+d.getMinutes()).slice(-2) +
+        ('0'+d.getSeconds()).slice(-2);
     }
 
-    document.getElementById("ticketId").value = generateTicketId();
+    document.getElementById('ticketId').value = generateTicketId();
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      const data = {
-        ticketId: form.ticketId.value,
-        projectNumber: form.projectNumber.value,
-        projectName: form.projectName.value,
-        projectManager: form.projectManager.value,
-        budget: form.budget.value,
-        startDate: form.startDate.value,
-        endDate: form.endDate.value,
-        priorityLevel: form.priorityLevel.value,
-        assignedTeam: form.assignedTeam.value,
-        remarks: form.remarks.value
-      };
-      fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
+      const payload = Object.fromEntries(new FormData(form));
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
       })
-      .then(res => res.text())
-      .then(msg => {
-        responseMsg.innerText = "Ticket submitted successfully!";
+      .then(r => r.text())
+      .then(txt => {
+        responseEl.textContent = 'Ticket submitted!';
         form.reset();
-        document.getElementById("ticketId").value = generateTicketId();
+        document.getElementById('ticketId').value = generateTicketId();
       })
-      .catch(err => {
-        responseMsg.innerText = "Error submitting ticket.";
+      .catch(() => {
+        responseEl.textContent = 'Submission failed.';
+        responseEl.style.color = 'red';
       });
     });
   </script>
