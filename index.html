@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>FPI Ticketing System</title>
+  <title>Submit Project Ticket</title>
   <style>
     body { font-family: Arial; margin: 20px auto; max-width: 700px; }
     input, textarea, select, button {
@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h2>Ticket Request Form</h2>
+  <h2>Submit a Project Ticket</h2>
   <form id="ticketForm">
     <input type="text" id="ticketId" name="ticketId" readonly />
     <input type="text" name="projectNumber" placeholder="Project Number" required />
@@ -30,13 +30,12 @@
     <textarea name="remarks" placeholder="Remarks"></textarea>
     <button type="submit">Submit Ticket</button>
   </form>
-  <p id="response" style="color:green"></p>
+
+  <p id="response" style="font-weight:bold;"></p>
   <p><a href="tickets.html">View Submitted Tickets →</a></p>
 
-  
-   
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec'; // replace with your URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec';
     const form = document.getElementById('ticketForm');
     const resp = document.getElementById('response');
 
@@ -53,26 +52,27 @@
 
     document.getElementById('ticketId').value = generateTicketId();
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'application/x-www-form-urlencoded'},
-        body: new URLSearchParams(data).toString()
-      })
-      .then(r => r.json())
-      .then(_ => {
-        resp.textContent = 'Ticket submitted successfully!';
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(data).toString()
+        });
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
+        resp.style.color = 'green';
+        resp.textContent = '✅ Ticket submitted successfully!';
         form.reset();
         document.getElementById('ticketId').value = generateTicketId();
-      })
-      .catch(() => {
-        resp.textContent = 'Error submitting ticket.';
+      } catch (err) {
+        console.error('Submit error:', err);
         resp.style.color = 'red';
-      });
+        resp.textContent = `❌ Error submitting ticket: ${err.message}`;
+      }
     });
   </script>
-
 </body>
 </html>
