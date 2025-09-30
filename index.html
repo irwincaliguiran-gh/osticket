@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ticketing System</title>
+  <title>Project Ticketing System</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
+    body { font-family: Arial; padding: 20px; max-width: 1000px; margin: auto; }
     input, textarea, select, button { width: 100%; margin-bottom: 10px; padding: 8px; }
     table { width: 100%; border-collapse: collapse; margin-top: 30px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -11,17 +11,23 @@
   </style>
 </head>
 <body>
-  <h2>Submit a Ticket</h2>
+  <h2>Submit a Project Ticket</h2>
   <form id="ticketForm">
-    <input type="text" name="name" placeholder="Your Name" required />
-    <input type="email" name="email" placeholder="Your Email" required />
-    <textarea name="issue" placeholder="Describe your issue" required></textarea>
-    <select name="priority" required>
-      <option value="">Select Priority</option>
+    <input type="text" name="ticketId" id="ticketId" readonly />
+    <input type="text" name="projectNumber" placeholder="Project Number" required />
+    <input type="text" name="projectName" placeholder="Project Name" required />
+    <input type="text" name="projectManager" placeholder="Project Manager" required />
+    <input type="number" name="budget" placeholder="Budget" required />
+    <input type="date" name="startDate" required />
+    <input type="date" name="endDate" required />
+    <select name="priorityLevel" required>
+      <option value="">Priority Level</option>
       <option value="Low">Low</option>
       <option value="Medium">Medium</option>
       <option value="High">High</option>
     </select>
+    <input type="text" name="assignedTeam" placeholder="Assigned Team" required />
+    <textarea name="remarks" placeholder="Remarks"></textarea>
     <button type="submit">Submit Ticket</button>
   </form>
 
@@ -32,10 +38,16 @@
     <thead>
       <tr>
         <th>Timestamp</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Issue</th>
-        <th>Priority</th>
+        <th>Ticket ID</th>
+        <th>Project Number</th>
+        <th>Project Name</th>
+        <th>Project Manager</th>
+        <th>Budget</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Priority Level</th>
+        <th>Assigned Team</th>
+        <th>Remarks</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -45,15 +57,34 @@
     const form = document.getElementById('ticketForm');
     const responseMsg = document.getElementById('response');
     const tableBody = document.querySelector("#ticketTable tbody");
-    const scriptURL = "AKfycbytGt0HTLF7QjJDBWNlZOZ8tMAWraJyBFQkDiLMXF7x"; // Replace with your actual Web App URL
+    const scriptURL = "YOUR_WEB_APP_URL"; // Replace with your actual Web App URL
+
+    function generateTicketId() {
+      const now = new Date();
+      return "TKT-" +
+        now.getFullYear().toString().slice(-2) +
+        ("0" + (now.getMonth() + 1)).slice(-2) +
+        ("0" + now.getDate()).slice(-2) + "-" +
+        ("0" + now.getHours()).slice(-2) +
+        ("0" + now.getMinutes()).slice(-2) +
+        ("0" + now.getSeconds()).slice(-2);
+    }
+
+    document.getElementById("ticketId").value = generateTicketId();
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       const data = {
-        name: form.name.value,
-        email: form.email.value,
-        issue: form.issue.value,
-        priority: form.priority.value
+        ticketId: form.ticketId.value,
+        projectNumber: form.projectNumber.value,
+        projectName: form.projectName.value,
+        projectManager: form.projectManager.value,
+        budget: form.budget.value,
+        startDate: form.startDate.value,
+        endDate: form.endDate.value,
+        priorityLevel: form.priorityLevel.value,
+        assignedTeam: form.assignedTeam.value,
+        remarks: form.remarks.value
       };
       fetch(scriptURL, {
         method: "POST",
@@ -64,7 +95,8 @@
       .then(msg => {
         responseMsg.innerText = "Ticket submitted successfully!";
         form.reset();
-        loadTickets(); // Refresh table
+        document.getElementById("ticketId").value = generateTicketId();
+        loadTickets();
       })
       .catch(err => {
         responseMsg.innerText = "Error submitting ticket.";
@@ -80,10 +112,16 @@
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${ticket.Timestamp}</td>
-              <td>${ticket.Name}</td>
-              <td>${ticket.Email}</td>
-              <td>${ticket.Issue}</td>
-              <td>${ticket.Priority}</td>
+              <td>${ticket["Ticket ID"]}</td>
+              <td>${ticket["Project Number"]}</td>
+              <td>${ticket["Project Name"]}</td>
+              <td>${ticket["Project Manager"]}</td>
+              <td>${ticket.Budget}</td>
+              <td>${ticket["Start Date"]}</td>
+              <td>${ticket["End Date"]}</td>
+              <td>${ticket["Priority Level"]}</td>
+              <td>${ticket["Assigned Team"]}</td>
+              <td>${ticket.Remarks}</td>
             `;
             tableBody.appendChild(row);
           });
@@ -93,7 +131,6 @@
         });
     }
 
-    // Load tickets on page load
     loadTickets();
   </script>
 </body>
