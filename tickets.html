@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>View Tickets</title>
+  <title>View Submitted Tickets</title>
   <style>
-    body { font-family: Arial; max-width: 1000px; margin: 20px auto; }
+    body { font-family: Arial; margin: 20px auto; max-width: 1000px; }
     table { width:100%; border-collapse:collapse; margin-top:20px; }
     th, td { border:1px solid #ccc; padding:8px; text-align:left; }
     th { background:#f2f2f2; }
@@ -16,10 +17,17 @@
   <table>
     <thead>
       <tr>
-        <th>Timestamp</th><th>Ticket ID</th><th>Project Number</th>
-        <th>Project Name</th><th>Project Manager</th><th>Budget</th>
-        <th>Start Date</th><th>End Date</th><th>Priority Level</th>
-        <th>Assigned Team</th><th>Remarks</th>
+        <th>Timestamp</th>
+        <th>Ticket ID</th>
+        <th>Project Number</th>
+        <th>Project Name</th>
+        <th>Project Manager</th>
+        <th>Budget</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Priority Level</th>
+        <th>Assigned Team</th>
+        <th>Remarks</th>
       </tr>
     </thead>
     <tbody id="ticketBody"></tbody>
@@ -27,30 +35,32 @@
   <button onclick="history.back()">← Back to Submit</button>
 
   <script>
-    // This callback is invoked by the JSONP script tag below
-    function renderTickets(data) {
-      const body = document.getElementById('ticketBody');
-      body.innerHTML = data.map(t => `
-        <tr>
-          <td>${t.Timestamp}</td>
-          <td>${t['Ticket ID']}</td>
-          <td>${t['Project Number']}</td>
-          <td>${t['Project Name']}</td>
-          <td>${t['Project Manager']}</td>
-          <td>$${parseFloat(t.Budget).toFixed(2)}</td>
-          <td>${t['Start Date']}</td>
-          <td>${t['End Date']}</td>
-          <td>${t['Priority Level']}</td>
-          <td>${t['Assigned Team']}</td>
-          <td>${t.Remarks}</td>
-        </tr>
-      `).join('');
-    }
+    const BODY = document.getElementById('ticketBody');
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCrpWcS0oNv5Xq8JVAKatE94JIzaUxTQk1FwMTT_7CpIfxHU-LLVMGTBTy3q79bwOr2Q/exec';
 
-    // Insert JSONP script to fetch data
-    const script = document.createElement('script');
-    script.src = 'https://script.google.com/macros/s/AKfycbyCrpWcS0oNv5Xq8JVAKatE94JIzaUxTQk1FwMTT_7CpIfxHU-LLVMGTBTy3q79bwOr2Q/exec';
-    document.body.appendChild(script);
+    fetch(SCRIPT_URL)
+      .then(r => r.json())
+      .then(data => {
+        BODY.innerHTML = data.map(t => `
+          <tr>
+            <td>${t.Timestamp}</td>
+            <td>${t['Ticket ID']}</td>
+            <td>${t['Project Number']}</td>
+            <td>${t['Project Name']}</td>
+            <td>${t['Project Manager']}</td>
+            <td>$${parseFloat(t.Budget).toFixed(2)}</td>
+            <td>${t['Start Date']}</td>
+            <td>${t['End Date']}</td>
+            <td>${t['Priority Level']}</td>
+            <td>${t['Assigned Team']}</td>
+            <td>${t.Remarks}</td>
+          </tr>
+        `).join('');
+      })
+      .catch(err => {
+        console.error('Load error:', err);
+        BODY.innerHTML = '<tr><td colspan="11">Error loading tickets</td></tr>';
+      });
   </script>
 </body>
 </html>
