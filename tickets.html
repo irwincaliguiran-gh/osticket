@@ -1,15 +1,14 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>View Submitted Tickets</title>
+  <title>View & Delete Tickets</title>
   <style>
-    body { font-family: Arial; margin: 20px auto; max-width: 1000px; }
+    body { font-family: Arial; max-width: 1000px; margin: 20px auto; }
     table { width:100%; border-collapse:collapse; margin-top:20px; }
     th, td { border:1px solid #ccc; padding:8px; text-align:left; }
     th { background:#f2f2f2; }
-    button { margin-top:20px; padding:8px 12px; }
+    button { padding:4px 8px; }
   </style>
 </head>
 <body>
@@ -17,50 +16,70 @@
   <table>
     <thead>
       <tr>
-        <th>Timestamp</th>
-        <th>Ticket ID</th>
-        <th>Project Number</th>
-        <th>Project Name</th>
-        <th>Project Manager</th>
-        <th>Budget</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Priority Level</th>
-        <th>Assigned Team</th>
-        <th>Remarks</th>
+        <th>Timestamp</th><th>Ticket ID</th><th>Project#</th><th>Project Name</th>
+        <th>Manager</th><th>Budget</th><th>Start</th><th>End</th>
+        <th>Priority</th><th>Team</th><th>Remarks</th><th>Delete</th>
       </tr>
     </thead>
-    <tbody id="ticketBody"></tbody>
+    <tbody id="ticketBody">
+      <tr><td colspan="12">Loading…</td></tr>
+    </tbody>
   </table>
-  <button onclick="history.back()">← Back to Submit</button>
+  <p><a href="index.html">← Back to Submit</a></p>
 
   <script>
-    const BODY = document.getElementById('ticketBody');
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCrpWcS0oNv5Xq8JVAKatE94JIzaUxTQk1FwMTT_7CpIfxHU-LLVMGTBTy3q79bwOr2Q/exec';
+    const BODY = document.getElementById('ticketBody');
 
-    fetch(SCRIPT_URL)
-      .then(r => r.json())
-      .then(data => {
-        BODY.innerHTML = data.map(t => `
-          <tr>
-            <td>${t.Timestamp}</td>
-            <td>${t['Ticket ID']}</td>
-            <td>${t['Project Number']}</td>
-            <td>${t['Project Name']}</td>
-            <td>${t['Project Manager']}</td>
-            <td>$${parseFloat(t.Budget).toFixed(2)}</td>
-            <td>${t['Start Date']}</td>
-            <td>${t['End Date']}</td>
-            <td>${t['Priority Level']}</td>
-            <td>${t['Assigned Team']}</td>
-            <td>${t.Remarks}</td>
-          </tr>
-        `).join('');
-      })
-      .catch(err => {
-        console.error('Load error:', err);
-        BODY.innerHTML = '<tr><td colspan="11">Error loading tickets</td></tr>';
+    function renderTickets(data) {
+      if (!Array.isArray(data) || data.length === 0) {
+        BODY.innerHTML = '<tr><td colspan="12">No tickets found.</td></tr>';
+        return;
+      }
+      BODY.innerHTML = data.map(t => `
+        <tr>
+          <td>${t.Timestamp}</td>
+          <td>${t['Ticket ID']}</td>
+          <td>${t['Project Number']}</td>
+          <td>${t['Project Name']}</td>
+          <td>${t['Project Manager']}</td>
+          <td>$${parseFloat(t.Budget).toFixed(2)}</td>
+          <td>${t['Start Date']}</td>
+          <td>${t['End Date']}</td>
+          <td>${t['Priority Level']}</td>
+          <td>${t['Assigned Team']}</td>
+          <td>${t.Remarks}</td>
+          <td><button onclick="deleteTicket('${t['Ticket ID']}')">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function loadTickets() {
+      const cb = 'renderTickets';
+      const script = document.createElement('script');
+      script.src = `${SCRIPT_URL}?callback=${cb}`;
+      document.body.appendChild(script);
+    }
+
+    function deleteTicket(id) {
+      // send delete request, then reload list
+      const params = new URLSearchParams();
+      params.append('action','delete');
+      params.append('ticketId', id);
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+        body: params
       });
+      setTimeout(() => {
+        BODY.innerHTML = '<tr><td colspan="12">Refreshing…</td></tr>';
+        loadTickets();
+      }, 500);
+    }
+
+    // initial load
+    loadTickets();
   </script>
 </body>
 </html>
