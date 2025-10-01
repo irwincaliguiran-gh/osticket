@@ -1,4 +1,4 @@
-const API_URL = 'YOUR_DEPLOYED_WEBAPP_URL';
+const API_URL = 'https://script.google.com/macros/s/AKfycbw1hL2ieVNC2dOmT2AwUgQgOgTPaNPFH1PfUZ1IDTkVmjygCUnxssirKt9F5Q3_j_JY/exec';
 
 function show(id) {
   document.getElementById('loginForm').style.display = id==='loginForm' ? 'block' : 'none';
