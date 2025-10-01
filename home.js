@@ -1,37 +1,46 @@
+const API_URL = 'https://script.google.com/macros/s/AKfycbw1hL2ieVNC2dOmT2AwUgQgOgTPaNPFH1PfUZ1IDTkVmjygCUnxssirKt9F5Q3_j_JY/exec';
+const USERNAME = localStorage.getItem('username');
+
 async function loadTickets() {
   const res = await fetch(API_URL, {
     method: 'POST',
     body: JSON.stringify({ action: 'search', query: '' })
   });
-  const tickets = await res.json();
-  renderTickets(tickets);
+  renderTickets(await res.json());
 }
 
-function showForm() {
-  document.getElementById('ticketForm').style.display = 'block';
+function toggleForm() {
+  const form = document.getElementById('ticketForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
-async function submitTicket(event) {
-  event.preventDefault();
-  const ticket = {
-    action: 'submit',
-    title: document.getElementById('title').value,
-    description: document.getElementById('desc').value
-  };
-  await fetch(API_URL, { method: 'POST', body: JSON.stringify(ticket) });
+async function submitTicket() {
+  const title = document.getElementById('title').value;
+  const description = document.getElementById('desc').value;
+  await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'submit',
+      username: USERNAME,
+      title,
+      description
+    })
+  });
   loadTickets();
 }
 
 async function search() {
-  const q = document.getElementById('searchInput').value;
+  const query = document.getElementById('searchInput').value;
   const res = await fetch(API_URL, {
     method: 'POST',
-    body: JSON.stringify({ action: 'search', query: q })
+    body: JSON.stringify({ action: 'search', query })
   });
   renderTickets(await res.json());
 }
 
-function renderTickets(list) {
-  const div = document.getElementById('content');
-  div.innerHTML = list.map(t => `<div><strong>${t.Title}</strong>: ${t.Description} [${t.Status}]</div>`).join('');
+function renderTickets(tickets) {
+  const container = document.getElementById('content');
+  container.innerHTML = tickets
+    .map(t => `<div><strong>${t.Title}</strong> — ${t.Description} [${t.Status}]</div>`)
+    .join('');
 }
