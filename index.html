@@ -2,77 +2,99 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Submit Project Ticket</title>
+  <title>FPI OS Ticketing</title>
   <style>
-    body { font-family: Arial; margin: 20px auto; max-width: 700px; }
-    input, textarea, select, button {
-      width: 100%; padding: 8px; margin: 6px 0;
+    body { font-family: Arial; max-width:600px; margin:20px auto; }
+    input, select, textarea, button {
+      width:100%; padding:8px; margin:6px 0;
+    }
+    #confirmModal {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.5); display:none; align-items:center;
+      justify-content:center;
+    }
+    #confirmModal .box {
+      background:#fff; padding:20px; max-width:500px; width:90%;
     }
   </style>
 </head>
 <body>
-  <h2>Submit a Project Ticket</h2>
+  <h2>Submit a Ticket</h2>
   <form id="ticketForm">
     <input type="text" id="ticketId" name="ticketId" readonly />
     <input type="text" name="projectNumber" placeholder="Project Number" required />
     <input type="text" name="projectName" placeholder="Project Name" required />
     <input type="text" name="projectManager" placeholder="Project Manager" required />
-    <input type="number" name="budget" placeholder="Budget (USD)" step="0.01" required />
+    <input type="number" name="budget" placeholder="Budget (Php)" step="0.01" required />
     <input type="date" name="startDate" required />
     <input type="date" name="endDate" required />
     <select name="priorityLevel" required>
       <option value="">Priority Level</option>
-      <option>Low</option>
-      <option>Medium</option>
-      <option>High</option>
+      <option>Low</option><option>Medium</option><option>High</option>
     </select>
     <input type="text" name="assignedTeam" placeholder="Assigned Team" required />
     <textarea name="remarks" placeholder="Remarks"></textarea>
-    <button type="submit">Submit Ticket</button>
+    <button type="submit">Submit</button>
   </form>
 
+  <!-- Confirmation Modal -->
+  <div id="confirmModal">
+    <div class="box">
+      <h3>Confirm Your Details</h3>
+      <pre id="summary"></pre>
+      <button id="editBtn">Edit</button>
+      <button id="confirmBtn">Confirm & Send</button>
+    </div>
+  </div>
+
   <p id="response" style="font-weight:bold;"></p>
-  <p><a href="tickets.html">View Submitted Tickets →</a></p>
+  <p><a href="tickets.html">→ View Tickets</a></p>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnFTV4iHdWYfM19mU45shDe7YPGG3a6rq4gl7_orlpZgdkoTdxYVBfc-nvr4iksy8WPw/exec';
+    const URL = 'https://script.google.com/macros/s/AKfycbw1hL2ieVNC2dOmT2AwUgQgOgTPaNPFH1PfUZ1IDTkVmjygCUnxssirKt9F5Q3_j_JY/exec';
     const form = document.getElementById('ticketForm');
+    const modal = document.getElementById('confirmModal');
+    const summary = document.getElementById('summary');
+    const editBtn = document.getElementById('editBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
     const resp = document.getElementById('response');
 
-    function generateTicketId() {
-      const d = new Date();
-      return 'TKT-' +
-        d.getFullYear().toString().slice(-2) +
-        ('0'+(d.getMonth()+1)).slice(-2) +
-        ('0'+d.getDate()).slice(-2) + '-' +
-        ('0'+d.getHours()).slice(-2) +
-        ('0'+d.getMinutes()).slice(-2) +
-        ('0'+d.getSeconds()).slice(-2);
+    // Generate Ticket ID
+    function genId() {
+      const d=new Date();
+      return 'TKT-'+d.getFullYear().toString().slice(-2)
+        +('0'+(d.getMonth()+1)).slice(-2)
+        +('0'+d.getDate()).slice(-2)+'-'
+        +('0'+d.getHours()).slice(-2)
+        +('0'+d.getMinutes()).slice(-2)
+        +('0'+d.getSeconds()).slice(-2);
     }
+    document.getElementById('ticketId').value=genId();
 
-    document.getElementById('ticketId').value = generateTicketId();
-
-    form.addEventListener('submit', async e => {
+    // Show confirmation
+    form.addEventListener('submit', e=>{
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(form));
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(data).toString()
-        });
-        const result = await res.json();
-        if (result.error) throw new Error(result.error);
-        resp.style.color = 'green';
-        resp.textContent = '✅ Ticket submitted successfully!';
-        form.reset();
-        document.getElementById('ticketId').value = generateTicketId();
-      } catch (err) {
-        console.error('Submit error:', err);
-        resp.style.color = 'red';
-        resp.textContent = `❌ Error submitting ticket: ${err.message}`;
-      }
+      const data=Object.fromEntries(new FormData(form));
+      summary.textContent=JSON.stringify(data, null, 2);
+      modal.style.display='flex';
     });
+    editBtn.onclick=()=>modal.style.display='none';
+
+    // Send to Apps Script
+    confirmBtn.onclick=async()=>{
+      const data=new URLSearchParams(Object.fromEntries(new FormData(form)));
+      await fetch(URL, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:data
+      });
+      modal.style.display='none';
+      resp.style.color='green';
+      resp.textContent='Ticket submitted! Refresh viewer to see it.';
+      form.reset();
+      document.getElementById('ticketId').value=genId();
+    };
   </script>
 </body>
 </html>
