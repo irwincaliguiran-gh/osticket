@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticketing System – Dashboard</title>
+  <script src="home.js" defer></script>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <button onclick="loadTickets()">View Tickets</button>
+  <button onclick="toggleForm()">Submit New Ticket</button>
+  <input id="searchInput" placeholder="Search by Title">
+  <button onclick="search()">Search</button>
+
+  <div id="ticketForm" style="display:none;">
+    <h2>New Ticket</h2>
+    <input id="title" placeholder="Title" required>
+    <textarea id="desc" placeholder="Description" required></textarea>
+    <button onclick="submitTicket()">Submit</button>
+  </div>
+
+  <div id="content"></div>
+</body>
+</html>
